@@ -17,10 +17,12 @@ from sklearn.metrics import r2_score
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
-
+import dagshub
 from src.mlproject.exception import CustomException
 from src.mlproject.logger import logging
 from src.mlproject.utils import save_object,evaluate_models
+import mlflow
+mlflow.autolog()
 
 
 @dataclass
@@ -117,7 +119,14 @@ class ModelTrainer:
 
             best_params = params[actual_model]
 
-            mlflow.set_registry_uri("https://dagshub.com/krishnaik06/mlprojecthindi.mlflow")
+
+            
+            dagshub.init(repo_owner='ShivamBaharwani', repo_name='mlproject', mlflow=True)
+
+
+
+
+            mlflow.set_registry_uri("https://dagshub.com/ShivamBaharwani/mlproject.mlflow")
             tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
             # mlflow
@@ -162,8 +171,6 @@ class ModelTrainer:
 
             r2_square = r2_score(y_test, predicted)
             return r2_square
-
-
 
         except Exception as e:
             raise CustomException(e,sys)
